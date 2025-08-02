@@ -12,7 +12,7 @@ Este projeto implementa uma solução completa de deep learning para classifica�
 ## Justificativa Técnica
 
 ### Arquitetura do Modelo
-A arquitetura MobileNetV2 foi escolhida por seu equilíbrio entre eficiência computacional e precisão, ideal para classificação em tempo real. Utilizei transfer learning com as camadas convolucionais congeladas (pré-treinadas no ImageNet) para extrair features robustas com um dataset limitado, adicionando Global Average Pooling para redução dimensional e uma camada densa final com softmax para classificação binária.
+A arquitetura MobileNetV2 foi escolhida por seu equilíbrio entre eficiência computacional e precisão, ideal para classificação em tempo real. Foi utilizado transfer learning com as camadas convolucionais congeladas (pré-treinadas no ImageNet) para extrair features robustas com um dataset limitado, adicionando Global Average Pooling para redução dimensional e uma camada densa final com softmax para classificação binária.
 - **Base Architecture**: MobileNetV2 (pré-treinada no ImageNet) foi selecionada por seu equilíbrio entre acurácia e eficiência computacional
 - **Transfer Learning**: Congelamento das camadas base para aproveitamento de features pré-treinadas
 - **Camadas Adicionais**:
@@ -21,7 +21,7 @@ A arquitetura MobileNetV2 foi escolhida por seu equilíbrio entre eficiência co
   - Dense Layer com ativação softmax para classificação
 
 ### Configuração de Treinamento
-O treinamento foi configurado com otimizador Adam (learning rate=1e-3) e função de perdo categórica cross-entropy, adequada para classificação binária. Como não tinham muitos dados, usei data augmentation com rotações, deslocamentos e flip horizontal para aumentar a robustez do modelo, enquanto callbacks de ModelCheckpoint e EarlyStopping (paciência=3) garantiam a seleção do melhor modelo e previniam overfitting.
+O treinamento foi configurado com otimizador Adam (learning rate=1e-3) e função de perdo categórica cross-entropy, adequada para classificação binária. Como não tinham muitos dados, foi usado data augmentation com rotações, deslocamentos e flip horizontal para aumentar a robustez do modelo, enquanto callbacks de ModelCheckpoint e EarlyStopping (paciência=3) garantiam a seleção do melhor modelo e previniam overfitting.
 - **Função de Perda**: Categorical Crossentropy
 - **Otimizador**: Adam (learning rate=1e-3)
 - **Métricas Monitoradas**: Accuracy, Precision, Recall
