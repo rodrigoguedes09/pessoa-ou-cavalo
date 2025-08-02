@@ -89,6 +89,7 @@ Para facilitar a visualização e teste com diferentes imagens, o Streamlit foi 
 
 ```bash
 #Para executar corretamente, é necessário estar no diretório correto da aplicação .../pessoa-ou-cavalo
+#Será utilizado o mesmo ambiente utilizado no primeiro terminal (venv). Essa reutilização facilita, poupando a instalação novamente dos requirements.txt
 
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
@@ -110,7 +111,7 @@ streamlit run streamlit_app/app.py
 ```bash
 mlflow ui
 ```
-Acesse: http://localhost:5000
+Acesse o url do MLFlow para as análises detalhadas e monitoramento do modelo.
 
 **Recursos disponíveis**:
 - Comparação entre execuções
