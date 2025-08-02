@@ -89,7 +89,7 @@ def main():
         
         with col1:
             st.subheader("Uploaded Image")
-            st.image(uploaded_file, use_column_width=True)
+            st.image(uploaded_file, use_container_width=True)
 
         with col2:
             if st.button("Classify Image", type="primary"):
