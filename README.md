@@ -1,132 +1,149 @@
-# Classificador Cavalo vs Humano - Teste Técnico para Engenheiro de IA
+# Classificador Cavalo vs Humano - Teste Way2
 
 ## Visão Geral do Projeto
-Este projeto implementa uma solução de deep learning para classificação binária de imagens entre cavalos e humanos. A solução inclui um modelo treinado, um serviço de inferência baseado em FastAPI, uma interface web em Streamlit e ferramentas completas de avaliação.
+Este projeto implementa uma solução completa de deep learning para classificação binária de imagens entre cavalos e humanos. A solução inclui:
+
+1. Pipeline de treinamento com MLflow para experiment tracking
+2. Modelo baseado em MobileNetV2 com transfer learning
+3. Serviço de inferência via FastAPI
+4. Interface web interativa com Streamlit
+5. Ferramentas de avaliação e análise de performance
 
 ## Justificativa Técnica
 
 ### Arquitetura do Modelo
-- **Base**: MobileNetV2 (pré-treinada no ImageNet) foi selecionada por seu equilíbrio entre acurácia e eficiência computacional, ideal para cenários que exigem baixa latência.
-- **Transfer Learning**: A base do modelo foi congelada para aproveitar os recursos pré-treinados, treinando apenas as camadas de classificação superiores - abordagem eficaz para conjuntos de dados limitados.
-- **Camadas Finais**:
-  - Global Average Pooling para redução dimensional
+A arquitetura MobileNetV2 foi escolhida por seu equilíbrio entre eficiência computacional e precisão, ideal para classificação em tempo real. Utilizei transfer learning com as camadas convolucionais congeladas (pré-treinadas no ImageNet) para extrair features robustas com um dataset limitado, adicionando Global Average Pooling para redução dimensional e uma camada densa final com softmax para classificação binária.
+- **Base Architecture**: MobileNetV2 (pré-treinada no ImageNet) foi selecionada por seu equilíbrio entre acurácia e eficiência computacional
+- **Transfer Learning**: Congelamento das camadas base para aproveitamento de features pré-treinadas
+- **Camadas Adicionais**:
+  - Global Average Pooling (redução dimensional)
   - Dropout (0.2) para regularização
-  - Camada Dense com ativação softmax para probabilidades de classe
+  - Dense Layer com ativação softmax para classificação
 
 ### Configuração de Treinamento
-- **Função de Perda**: Entropia cruzada categórica - apropriada para classificação
-- **Otimizador**: Adam com taxa de aprendizado 1e-3
-- **Métricas**: Acurácia, Precisão e Recall monitorados
-- **Aumento de Dados**: Rotações, deslocamentos, zoom e inversões para melhor generalização
+O treinamento foi configurado com otimizador Adam (learning rate=1e-3) e função de perdo categórica cross-entropy, adequada para classificação binária. Como não tinham muitos dados, usei data augmentation com rotações, deslocamentos e flip horizontal para aumentar a robustez do modelo, enquanto callbacks de ModelCheckpoint e EarlyStopping (paciência=3) garantiam a seleção do melhor modelo e previniam overfitting.
+- **Função de Perda**: Categorical Crossentropy
+- **Otimizador**: Adam (learning rate=1e-3)
+- **Métricas Monitoradas**: Accuracy, Precision, Recall
+- **Data Augmentation**: Rotação (20°), deslocamento (0.2), zoom (0.2), flip horizontal
 - **Callbacks**:
-  - ModelCheckpoint para salvar melhores pesos
-  - EarlyStopping (paciência=3) para evitar overfitting
+  - ModelCheckpoint (salva melhores pesos)
+  - EarlyStopping (patience=3)
 
-### Validação
-- Divisão treino/validação (80/20)
-- Normalização e redimensionamento (1/255) consistente
-- Amostragem estratificada mantendo equilíbrio de classes
+### Monitoramento com MLflow
+- Tracking automático de:
+  - Parâmetros do modelo
+  - Métricas de treino/validação
+  - Artefatos (modelos, gráficos)
+- Interface visual disponível via `mlflow ui`
 
 ## Instruções de Configuração
 
 ### Pré-requisitos
 - Python 3.8+
-- TensorFlow 2.x
-- FastAPI
-- Streamlit
-- Dependências adicionais em `requirements.txt`
+- TensorFlow 2.12+
+- MLflow 2.3+
+- Dependências completas em `requirements.txt`
 
 ### Instalação
-1. Clonar o repositório:
 ```bash
-git clone https://github.com/[seu-repo]/horse-or-human-classifier.git
-cd horse-or-human-classifier
-```
-
-2. Criar e ativar ambiente virtual:
-```bash
+git clone https://github.com/rodrigoguedes09/horse-human-classifier.git
+cd horse-human-classifier
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate  # Windows
-```
-
-3. Instalar dependências:
-```bash
+source venv/bin/activate  # Linux/MacOS
+venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-## Instruções de Uso
+## Fluxo de Execução Completo
 
-### Inferência via API
-1. Iniciar servidor FastAPI:
+### 1. Treinamento do Modelo
 ```bash
-uvicorn api.main:app --reload
+python training/train_model.py
 ```
+**Saídas**:
+- Modelo salvo em `model/horse_human_mobilenetv2.h5`
+- Dados de treino registrados no MLflow
 
-2. Enviar requisições:
-```bash
-curl -X POST -F "file=@imagem_teste.jpg" http://localhost:8000/predict
-```
-
-**Especificações da API:**
-- Endpoint: `POST /predict`
-- Formatos aceitos: JPEG, PNG
-- Tamanho máximo: 5MB
-- Resposta:
-```json
-{
-  "class": "horse|human",
-  "confidence": 0.95,
-  "message": "Classified as horse with 95.00% confidence"
-}
-```
-
-### Interface Web
-1. Executar aplicação Streamlit:
-```bash
-streamlit run streamlit_app/app.py
-```
-
-2. Utilizar a interface para upload de imagens e visualização de previsões.
-
-### Avaliação do Modelo
-Executar script de avaliação:
+### 2. Avaliação do Modelo
 ```bash
 python evaluation/evaluate_model.py
 ```
+**Saídas**:
+- Matriz de confusão em `evaluation/output/matriz_confusao.png`
+- Relatório completo em `evaluation/output/relatorio_metricas.txt`
+- Métricas adicionais no MLflow
 
-Saídas geradas:
-- Matriz de confusão
-- Relatório de classificação (precisão, recall, f1-score)
-- Métricas de acurácia e perda
+### 3. Serviço de Inferência (API)
+```bash
+uvicorn api.main:app --reload
+```
+**Endpoints**:
+- `POST /predict`: Classificação de imagens
+- `GET /docs`: Documentação interativa (Swagger)
+
+### 4. Interface Web
+Para facilitar a visualização e teste com diferentes imagens, o Streamlit foi utilizado. Apesar de simples, essa é uma forma fácil de conseguir uma aplicação estéticamente agradável e que é facilmente implementada com códigos Python.
+```bash
+streamlit run streamlit_app/app.py
+```
+**Funcionalidades**:
+- Upload de imagens via interface gráfica
+- Visualização dos resultados
+- Exibição do nível de confiança
+
+  <img width="1032" height="950" alt="image" src="https://github.com/user-attachments/assets/cd850a4f-cd15-44dc-92c1-77a5ddbeda0e" />
+
+
+## Monitoramento com MLflow
+
+### Acesso aos Resultados
+```bash
+mlflow ui
+```
+Acesse: http://localhost:5000
+
+**Recursos disponíveis**:
+- Comparação entre execuções
+- Visualização de métricas históricas
+- Download de modelos e artefatos
+
+### Dados Registrados Automaticamente
+- Parâmetros (learning rate, batch size, etc.)
+- Métricas (loss, accuracy por época)
+- Artefatos (modelos, gráficos de treinamento)
+- Ambiente (versões de pacotes)
 
 ## Análise de Performance
 
-### Efetividade do Modelo
-Métricas alcançadas:
-- Acurácia na validação: 98.2%
-- Precisão (classe humana): 98.5%
-- Recall (classe cavalo): 97.8%
-- Tempo de inferência: <150ms em CPU
+### Métricas Obtidas
+| Classe   | Precision | Recall | F1-Score | Suporte |
+|----------|-----------|--------|----------|---------|
+| horse    | 1.0000    | 0.9922 | 0.9961   | 128     |
+| person   | 0.9922    | 1.0000 | 0.9961   | 128     |
 
-A solução atende plenamente aos requisitos de distinção entre cavalos e humanos em imagens, com desempenho robusto em diversas condições.
+**Métricas Globais**  
+- **Acurácia**: 0.9961  
+- **Macro Avg**: 0.9961 (precision), 0.9961 (recall), 0.9961 (f1-score)  
+- **Weighted Avg**: 0.9961 (precision), 0.9961 (recall), 0.9961 (f1-score) 
 
-### Limitações e Melhorias
+### Limitações Conhecidas
+1. Sensibilidade a fundos complexos
+2. Dificuldade com imagens de baixa resolução
+3. Variabilidade em poses atípicas
 
-**Melhorias Imediatas:**
-1. Ampliação do dataset com maior diversidade de exemplos
-2. Hard negative mining para casos mal classificados
-3. Quantização para otimização
+### Roadmap de Melhorias
+1. **Dataset**:
+   - Ampliação com exemplos negativos
+   - Balanceamento de subclasses
 
-**Melhorias Arquiteturais:**
-1. Testar arquiteturas EfficientNet
-2. Implementar aumento de dados durante inferência
-3. Adicionar estimativa de incerteza
+2. **Modelo**:
+   - Teste com EfficientNetV2
+   - Técnicas de fine-tuning avançado
 
-**Melhorias Operacionais:**
-1. Containerização dos componentes (Docker)
-2. Pipelines CI/CD para retreinamento
-3. Monitoramento de desempenho
+3. **Sistema**:
+   - Containerização com Docker
+   - Pipeline de CI/CD
 
 ## Licença
 Este projeto é código proprietário desenvolvido para processo de avaliação técnica. Todos os direitos reservados.
