@@ -92,7 +92,8 @@ streamlit run streamlit_app/app.py
 - Visualização dos resultados
 - Exibição do nível de confiança
 
-  <img width="1032" height="950" alt="image" src="https://github.com/user-attachments/assets/cd850a4f-cd15-44dc-92c1-77a5ddbeda0e" />
+<img width="939" height="819" alt="image" src="https://github.com/user-attachments/assets/db6d1443-fa5c-4d27-a5e7-4fabc2f265c6" />
+
 
 
 ## Monitoramento com MLflow
