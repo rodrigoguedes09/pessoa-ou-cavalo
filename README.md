@@ -83,8 +83,16 @@ uvicorn api.main:app --reload
 - `GET /docs`: Documentação interativa (Swagger)
 
 ### 4. Interface Web
-Para facilitar a visualização e teste com diferentes imagens, o Streamlit foi utilizado. Apesar de simples, essa é uma forma fácil de conseguir uma aplicação estéticamente agradável e que é facilmente implementada com códigos Python.
+Para facilitar a visualização e teste com diferentes imagens, o Streamlit foi utilizado. Apesar de simples, essa é uma forma fácil de conseguir uma aplicação estéticamente agradável e que é facilmente implementada com códigos Python. 
+
+**NOTA: Para perfeito funcionamento, execute o app streamlit em um terminal diferente do Serviço de Inferência (API).**
+
 ```bash
+#Para executar corretamente, é necessário estar no diretório correto da aplicação .../pessoa-ou-cavalo
+
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
 streamlit run streamlit_app/app.py
 ```
 **Funcionalidades**:
