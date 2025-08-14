@@ -1,51 +1,53 @@
-# Classificador Cavalo vs Humano - Teste Way2
+# Horse vs Human Classifier - Way2 Test
 
-## Visão Geral do Projeto
-Este projeto implementa uma solução completa de deep learning para classificação binária de imagens entre cavalos e humanos. A solução inclui:
+## Project Overview
+This project implements a complete deep learning solution for binary image classification between horses and humans. The solution includes:
 
-1. Pipeline de treinamento com MLflow para experiment tracking
-2. Modelo baseado em MobileNetV2 com transfer learning
-3. Serviço de inferência via FastAPI
-4. Interface web interativa com Streamlit
-5. Ferramentas de avaliação e análise de performance
+1. Training pipeline with MLflow for experiment tracking  
+2. MobileNetV2-based model with transfer learning  
+3. Inference service via FastAPI  
+4. Interactive web interface with Streamlit  
+5. Performance evaluation and analysis tools  
 
-## Justificativa Técnica
+## Technical Justification
 
-### Arquitetura do Modelo
-A arquitetura MobileNetV2 foi escolhida por seu equilíbrio entre eficiência computacional e precisão, ideal para classificação em tempo real. Foi utilizado transfer learning com as camadas convolucionais congeladas (pré-treinadas no ImageNet) para extrair features robustas com um dataset limitado, adicionando Global Average Pooling para redução dimensional e uma camada densa final com softmax para classificação binária.
-- **Base Architecture**: MobileNetV2 (pré-treinada no ImageNet) foi selecionada por seu equilíbrio entre acurácia e eficiência computacional
-- **Transfer Learning**: Congelamento das camadas base para aproveitamento de features pré-treinadas
-- **Camadas Adicionais**:
-  - Global Average Pooling (redução dimensional)
-  - Dropout (0.2) para regularização
-  - Dense Layer com ativação softmax para classificação
+### Model Architecture
+The MobileNetV2 architecture was chosen for its balance between computational efficiency and accuracy, ideal for real-time classification. We used transfer learning with frozen convolutional layers (pre-trained on ImageNet) to extract robust features with limited data, adding Global Average Pooling for dimensionality reduction and a final dense layer with softmax for binary classification.
 
-### Configuração de Treinamento
-O treinamento foi configurado com otimizador Adam (learning rate=1e-3) e função de perdo categórica cross-entropy, adequada para classificação binária. Como não tinham muitos dados, foi usado data augmentation com rotações, deslocamentos e flip horizontal para aumentar a robustez do modelo, enquanto callbacks de ModelCheckpoint e EarlyStopping (paciência=3) garantiam a seleção do melhor modelo e previniam overfitting.
-- **Função de Perda**: Categorical Crossentropy
-- **Otimizador**: Adam (learning rate=1e-3)
-- **Métricas Monitoradas**: Accuracy, Precision, Recall
-- **Data Augmentation**: Rotação (20°), deslocamento (0.2), zoom (0.2), flip horizontal
-- **Callbacks**:
-  - ModelCheckpoint (salva melhores pesos)
-  - EarlyStopping (patience=3)
+- **Base Architecture**: MobileNetV2 (ImageNet pre-trained) selected for its accuracy/computational efficiency balance  
+- **Transfer Learning**: Frozen base layers to leverage pre-trained features  
+- **Additional Layers**:  
+  - Global Average Pooling (dimensionality reduction)  
+  - Dropout (0.2) for regularization  
+  - Softmax-activated Dense Layer for classification  
 
-### Monitoramento com MLflow
-- Tracking automático de:
-  - Parâmetros do modelo
-  - Métricas de treino/validação
-  - Artefatos (modelos, gráficos)
-- Interface visual disponível via `mlflow ui`
+### Training Configuration
+Training used Adam optimizer (learning rate=1e-3) and categorical cross-entropy loss, suitable for binary classification. With limited data, we applied augmentation (rotations, shifts, horizontal flip) to improve model robustness, while ModelCheckpoint and EarlyStopping (patience=3) callbacks ensured best model selection and prevented overfitting.
 
-## Instruções de Configuração
+- **Loss Function**: Categorical Crossentropy  
+- **Optimizer**: Adam (learning rate=1e-3)  
+- **Monitored Metrics**: Accuracy, Precision, Recall  
+- **Data Augmentation**: Rotation (20°), shift (0.2), zoom (0.2), horizontal flip  
+- **Callbacks**:  
+  - ModelCheckpoint (saves best weights)  
+  - EarlyStopping (patience=3)  
 
-### Pré-requisitos
-- Python 3.8+
-- TensorFlow 2.12+
-- MLflow 2.3+
-- Dependências completas em `requirements.txt`
+### MLflow Monitoring
+- Automatic tracking of:  
+  - Model parameters  
+  - Training/validation metrics  
+  - Artifacts (models, graphs)  
+- Visual interface via `mlflow ui`  
 
-### Instalação
+## Setup Instructions
+
+### Prerequisites
+- Python 3.8+  
+- TensorFlow 2.12+  
+- MLflow 2.3+  
+- Full dependencies in `requirements.txt`  
+
+### Installation
 ```bash
 git clone https://github.com/rodrigoguedes09/horse-human-classifier.git
 cd horse-human-classifier
@@ -55,105 +57,100 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-## Fluxo de Execução Completo
+## Complete Execution Flow
 
-### 1. Treinamento do Modelo
+### 1. Model Training
 ```bash
 python training/train_model.py
 ```
-**Saídas**:
-- Modelo salvo em `model/horse_human_mobilenetv2.h5`
-- Dados de treino registrados no MLflow
+**Outputs**:  
+- Model saved at `model/horse_human_mobilenetv2.h5`  
+- Training data logged in MLflow  
 
-### 2. Avaliação do Modelo
+### 2. Model Evaluation
 ```bash
 python evaluation/evaluate_model.py
 ```
-**Saídas**:
-- Matriz de confusão em `evaluation/output/matriz_confusao.png`
-- Relatório completo em `evaluation/output/relatorio_metricas.txt`
-- Métricas adicionais no MLflow
+**Outputs**:  
+- Confusion matrix at `evaluation/output/confusion_matrix.png`  
+- Full report at `evaluation/output/metric_report.txt`  
+- Additional metrics in MLflow  
 
-### 3. Serviço de Inferência (API)
+### 3. Inference Service (API)
 ```bash
 uvicorn api.main:app --reload
 ```
-**Endpoints**:
-- `POST /predict`: Classificação de imagens
-- `GET /docs`: Documentação interativa (Swagger)
+**Endpoints**:  
+- `POST /predict`: Image classification  
+- `GET /docs`: Interactive documentation (Swagger)  
 
-### 4. Interface Web
-Para facilitar a visualização e teste com diferentes imagens, o Streamlit foi utilizado. Apesar de simples, essa é uma forma fácil de conseguir uma aplicação estéticamente agradável e que é facilmente implementada com códigos Python. 
+### 4. Web Interface
+For easy visualization and testing with different images, we used Streamlit. Despite its simplicity, it provides an aesthetically pleasing application that's easily implemented with Python code.
 
-**NOTA: Para perfeito funcionamento, execute o app streamlit em um terminal diferente do Serviço de Inferência (API).**
+**NOTE: For proper operation, run the Streamlit app in a separate terminal from the Inference Service (API).**
 
 ```bash
-#Para executar corretamente, é necessário estar no diretório correto da aplicação .../pessoa-ou-cavalo
-#Será utilizado o mesmo ambiente utilizado no primeiro terminal (venv). Essa reutilização facilita, poupando a instalação novamente dos requirements.txt
+# To run correctly, you must be in the correct application directory .../horse-human-classifier
+# We'll reuse the same environment from the first terminal (venv), saving reinstallation of requirements.txt
 
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 
 streamlit run streamlit_app/app.py
 ```
-**Funcionalidades**:
-- Upload de imagens via interface gráfica
-- Visualização dos resultados
-- Exibição do nível de confiança
+**Features**:  
+- Graphical image upload  
+- Result visualization  
+- Confidence level display  
 
 <img width="939" height="819" alt="image" src="https://github.com/user-attachments/assets/db6d1443-fa5c-4d27-a5e7-4fabc2f265c6" />
 
+## MLflow Monitoring
 
-
-## Monitoramento com MLflow
-
-### Acesso aos Resultados
+### Accessing Results
 ```bash
 mlflow ui
 ```
-Acesse o url do MLFlow para as análises detalhadas e monitoramento do modelo.
+Access the MLFlow URL for detailed analysis and model monitoring.
 
-**Recursos disponíveis**:
-- Comparação entre execuções
-- Visualização de métricas históricas
-- Download de modelos e artefatos
+**Available features**:  
+- Run comparisons  
+- Historical metric visualization  
+- Model/artifact downloads  
 
-### Dados Registrados Automaticamente
-- Parâmetros (learning rate, batch size, etc.)
-- Métricas (loss, accuracy por época)
-- Artefatos (modelos, gráficos de treinamento)
-- Ambiente (versões de pacotes)
+### Automatically Logged Data
+- Parameters (learning rate, batch size, etc.)  
+- Metrics (loss, accuracy per epoch)  
+- Artifacts (models, training graphs)  
+- Environment (package versions)  
 
-## Análise de Performance
+## Performance Analysis
 
-### Métricas Obtidas
-| Classe   | Precision | Recall | F1-Score | Suporte |
+### Obtained Metrics
+| Class   | Precision | Recall | F1-Score | Support |
 |----------|-----------|--------|----------|---------|
 | horse    | 1.0000    | 0.9922 | 0.9961   | 128     |
 | person   | 0.9922    | 1.0000 | 0.9961   | 128     |
 
-**Métricas Globais**  
-- **Acurácia**: 0.9961  
+**Global Metrics**  
+- **Accuracy**: 0.9961  
 - **Macro Avg**: 0.9961 (precision), 0.9961 (recall), 0.9961 (f1-score)  
-- **Weighted Avg**: 0.9961 (precision), 0.9961 (recall), 0.9961 (f1-score) 
+- **Weighted Avg**: 0.9961 (precision), 0.9961 (recall), 0.9961 (f1-score)  
 
-### Limitações Conhecidas
-1. Sensibilidade a fundos complexos
-2. Dificuldade com imagens de baixa resolução
-3. Variabilidade em poses atípicas
+### Known Limitations
+1. Sensitivity to complex backgrounds  
+2. Difficulty with low-resolution images  
+3. Variability with atypical poses  
 
-### Roadmap de Melhorias
-1. **Dataset**:
-   - Ampliação com exemplos negativos
-   - Balanceamento de subclasses
+### Improvement Roadmap
+1. **Dataset**:  
+   - Expansion with negative examples  
+   - Subclass balancing  
 
-2. **Modelo**:
-   - Teste com EfficientNetV2
-   - Técnicas de fine-tuning avançado
+2. **Model**:  
+   - Testing with EfficientNetV2  
+   - Advanced fine-tuning techniques  
 
-3. **Sistema**:
-   - Containerização com Docker
-   - Pipeline de CI/CD
-
-## Licença
-Este projeto é código proprietário desenvolvido para processo de avaliação técnica. Todos os direitos reservados.
+3. **System**:  
+   - Docker containerization  
+   - CI/CD pipeline  
