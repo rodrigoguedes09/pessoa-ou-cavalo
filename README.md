@@ -1,4 +1,4 @@
-# Horse vs Human Classifier - Way2 Test
+# Horse vs Human Classifier - CNN
 
 ## Project Overview
 This project implements a complete deep learning solution for binary image classification between horses and humans. The solution includes:
